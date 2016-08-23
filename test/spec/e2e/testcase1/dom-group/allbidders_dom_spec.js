@@ -5,8 +5,8 @@ module.exports = {
   'adequant ad rendering' : function (browser) {
     browser
       .url('http://localhost:9999/test/spec/e2e/gpt-examples/all_bidders_instant_load.html')
-      .waitForElementVisible('body', 3000)
-      .pause(5000)
+      .waitForElementVisible('body', 5000)
+      .pause(10000)
       .execute(util.findIframeInDiv, ['div-1'], function(result) {
         this.verify.equal(result.value, true, 'adequant ad not rendered');
       });

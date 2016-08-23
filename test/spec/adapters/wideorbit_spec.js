@@ -2,7 +2,7 @@ describe('wideorbit adapter tests', function () {
 
     var expect = require('chai').expect;
     var urlParse = require('url-parse');
-    
+
     // FYI: querystringify will perform encoding/decoding
     var querystringify = require('querystringify');
 
@@ -156,9 +156,9 @@ describe('wideorbit adapter tests', function () {
                                 height: 300,
                                 rank: 123,
                                 ecpm: 1.8
-                            },
+                              },
                             placementCode: 'div-gpt-ad-12345-2'
-                        }
+                          }
                     ]
                 };
 
@@ -389,7 +389,7 @@ describe('wideorbit adapter tests', function () {
             expect(bidObject1.height).to.equal(100);
             expect(bidObject1.getStatusCode()).to.equal(1);
             expect(bidObject1.bidderCode).to.equal('wideorbit');
-            
+
             expect(bidPlacementCode2).to.equal('div-gpt-ad-12345-2');
             expect(bidObject2.cpm).to.equal(1.50);
             expect(bidObject2.ad).to.equal('<img src="http://www.admeta.com/2b.gif"></img><img src="http://www.admeta.com/2a.gif" width="0" height="0" style="position:absolute"></img><div data-id="div-gpt-ad-12345-2">The AD 2 itself...</div>');
@@ -474,6 +474,7 @@ describe('wideorbit adapter tests', function () {
                 ],
                 Placements: placements
             };
+            console.log('oooooooooooooo');
 
             $$PREBID_GLOBAL$$.handleWideOrbitCallback(response);
 
@@ -488,4 +489,3 @@ describe('wideorbit adapter tests', function () {
     });
 
 });
-  

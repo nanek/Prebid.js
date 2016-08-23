@@ -95,30 +95,7 @@ gulp.task('test', function () {
 
   if (argv.browserstack) {
     browserArgs = [
-      'bs_ie_13_windows_10',
-      'bs_ie_11_windows_10',
-      'bs_firefox_46_windows_10',
-      'bs_chrome_51_windows_10',
-      'bs_ie_11_windows_8.1',
-      'bs_firefox_46_windows_8.1',
-      'bs_chrome_51_windows_8.1',
-      'bs_ie_10_windows_8',
-      'bs_firefox_46_windows_8',
-      'bs_chrome_51_windows_8',
-      'bs_ie_11_windows_7',
-      'bs_ie_10_windows_7',
-      'bs_ie_9_windows_7',
-      'bs_firefox_46_windows_7',
-      'bs_chrome_51_windows_7',
-      'bs_safari_9.1_mac_elcapitan',
-      'bs_firefox_46_mac_elcapitan',
-      'bs_chrome_51_mac_elcapitan',
-      'bs_safari_8_mac_yosemite',
-      'bs_firefox_46_mac_yosemite',
-      'bs_chrome_51_mac_yosemite',
-      'bs_safari_7.1_mac_mavericks',
-      'bs_firefox_46_mac_mavericks',
-      'bs_chrome_49_mac_mavericks'
+      'bs_ie_11_windows_8.1'
     ];
   }
 
@@ -222,4 +199,88 @@ gulp.task('e2etest', function() {
   return gulp.src('')
     .pipe(shell('nightwatch ' + cmd));
 
+});
+
+var jv = require('junit-viewer');
+// this will have all of a copy of the normal fs methods as well
+var fs = require('fs.extra');
+
+gulp.task('test-report',function(){
+  var dir = './build/coverage/e2e/reports/testcase1/';
+  if(argv.group) {
+    var grp = argv.group;
+    dir = dir + grp;
+  } else {
+    var files = fs.readdirSync(dir);
+    dir = dir + files[0];
+  }
+
+  if(!argv.spec) {
+    //report error and return
+  }
+  var spec = argv.spec;
+
+  //get all environments from xml filenames
+  var env = [];
+  var files = fs.readdirSync(dir);
+  files.forEach(item => {
+      var temp = item.substr(0,item.search(spec));
+      if(temp !== "") {
+        if(env.indexOf(temp) === -1) {
+          env.push(temp);
+        }
+      }
+    }
+  );
+
+  //create new directory structure
+  var targetDestinationDir = './c3';
+  fs.rmrfSync(targetDestinationDir);
+  env.forEach(item => {
+    fs.mkdirp(targetDestinationDir + '/' + item);
+  });
+
+  //move xml files to newly created directory
+  var walker = fs.walk('./build/coverage/e2e/reports');
+
+  walker.on("file", function (root, stat, next) {
+    env.forEach(item => {
+      if(stat.name.search(item) !== -1) {
+        var src = root + '/' + stat.name;
+        var dest = targetDestinationDir + '/' + item + '/' + stat.name;
+        fs.copy(src, dest, {replace: true}, function(err) {
+          if(err) {
+            throw err;
+          }
+        });
+      }
+    });
+    next();
+  });
+
+  //execute junit-viewer --results=./custom-reports/chrome51 --save=./chrome.html
+
+  //create e2e-results.html
+  var li = '';
+  var tabs = '';
+  env.forEach(function(item,i) {
+    i++;
+    li = li + '<li><a href="#tabs-'+i+'">'+item+'</a></li>';
+    tabs = tabs + '<div id="tabs-'+i+'"><iframe src="/chrome.html" frameborder="0" style="overflow:hidden;overflow-x:hidden;overflow-y:hidden;height:100%;width:100%;position:absolute;top:50px;left:0px;right:0px;bottom:0px" height="100%" width="100%"></iframe></div>';
+  });
+  var html = '<ul>' + li + '</ul>' + tabs;
+
+
+
+
+  var parsedData = jv.parse('./custom-reports');
+  var renderedData = jv.render(parsedData);
+  //console.log(parsedData);
+  //console.log(renderedData);
+});
+
+gulp.task('temp', function() {
+  shell.task([
+    'echo test'
+])
 });
