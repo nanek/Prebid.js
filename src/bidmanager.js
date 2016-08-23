@@ -41,10 +41,6 @@ function getBidders(bid) {
 }
 
 function bidsBackAdUnit(adUnitCode) {
-  //console.log("+++++++++++");
-  //console.log(adUnitCode);
-  //console.log($$PREBID_GLOBAL$$.adUnits);
-  //adUnitCode = "adUnit2";
   const requested = $$PREBID_GLOBAL$$.adUnits.find(unit => unit.code === adUnitCode).bids.length;
   const received = $$PREBID_GLOBAL$$._bidsReceived.filter(bid => bid.adUnitCode === adUnitCode).length;
   return requested === received;
@@ -82,6 +78,7 @@ exports.addBidResponse = function (adUnitCode, bid) {
       bidder: bid.bidderCode,
       adUnitCode
     });
+
     bid.timeToRespond = bid.responseTimestamp - bid.requestTimestamp;
 
     if (bid.timeToRespond > $$PREBID_GLOBAL$$.bidderTimeout) {
@@ -256,11 +253,10 @@ exports.executeCallback = function (timedOut) {
       processCallbacks([externalOneTimeCallback]);
     }
     finally {
+      $$PREBID_GLOBAL$$.clearAuction();
       externalOneTimeCallback = null;
     }
   }
-
-  $$PREBID_GLOBAL$$.clearAuction();
 };
 
 function triggerAdUnitCallbacks(adUnitCode) {
